@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZENITH | Global On-Demand Super-App</title>
+    <meta name="description" content="Zenith by Zenith Global Industries - Connect with verified local & global experts instantly.">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Inter & Plus Jakarta Sans Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #030712; }
+        h1, h2, h3, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* Hide Scrollbars for Native App Feel */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth Glass & Glow */
+        .glass-panel { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
+        .radar-ping { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+    </style>
+</head>
+<body class="text-slate-100 flex justify-center items-center min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- APP SHELL CONTAINER -->
+    <div class="w-full max-w-md h-[100dvh] sm:h-[92vh] sm:max-h-[880px] bg-slate-900 sm:border sm:border-slate-800/90 sm:rounded-[44px] shadow-[0_0_80px_rgba(79,70,229,0.12)] flex flex-col overflow-hidden relative">
+        
+        <!-- TOP COMMAND HEADER -->
+        <header class="px-5 py-4 flex justify-between items-center glass-panel border-b border-slate-800/80 sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                    <span class="font-display font-extrabold text-white text-lg tracking-tighter">Z</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-lg font-extrabold tracking-wider text-white leading-none">ZENITH</h1>
+                        <span class="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 rounded-md">LIVE</span>
+                    </div>
+                    <button onclick="cycleLocation()" class="flex items-center gap-1 text-[11px] text-slate-400 hover:text-indigo-300 transition-colors mt-1">
+                        <i data-lucide="map-pin" class="w-3 h-3 text-indigo-400"></i>
+                        <span id="location-label">D.I. Khan, PK</span>
+                        <i data-lucide="chevron-down" class="w-2.5 h-2.5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <!-- Mode Indicator Pill -->
+                <button onclick="toggleAppMode()" id="mode-pill" class="px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all flex items-center gap-1.5 bg-slate-800/90 border-slate-700 text-slate-200 hover:border-indigo-500">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="mode-text">Client</span>
+                </button>
+                <button onclick="switchTab('profile')" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-indigo-300 hover:border-indigo-400 transition-all">
+                    UZ
+                </button>
+            </div>
+        </header>
+
+        <!-- TOAST NOTIFICATION BANNER -->
+        <div id="toast" class="hidden absolute top-20 left-5 right-5 z-50 bg-slate-800/95 border border-indigo-500/40 text-white px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 transition-all">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+            <span id="toast-msg" class="text-xs font-medium">Action completed</span>
+        </div>
+
+        <!-- MAIN DYNAMIC VIEWPORT -->
+        <main id="viewport" class="flex-1 overflow-y-auto px-5 py-4 space-y-5 pb-28 no-scrollbar">
+            <!-- Views injected dynamically at 0ms latency -->
+        </main>
+
+        <!-- BOTTOM NAVIGATION DOCK -->
+        <nav class="absolute bottom-0 left-0 right-0 h-20 glass-panel border-t border-slate-800/80 px-6 flex justify-around items-center z-30">
+            <button onclick="switchTab('explore')" id="tab-explore" class="flex flex-col items-center gap-1 transition-all text-indigo-400">
+                <i data-lucide="compass" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold tracking-wide">Explore</span>
+            </button>
+            <button onclick="switchTab('orders')" id="tab-orders" class="flex flex-col items-center gap-1 transition-all text-slate-500 hover:text-slate-300 relative">
+                <i data-lucide="layers" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold tracking-wide">Orders</span>
+                <span id="order-badge" class="hidden absolute -top-1 right-1 w-2 h-2 rounded-full bg-indigo-500"></span>
+            </button>
+            <button onclick="switchTab('hub')" id="tab-hub" class="flex flex-col items-center gap-1 transition-all text-slate-500 hover:text-slate-300">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold tracking-wide">Studio</span>
+            </button>
+            <button onclick="switchTab('profile')" id="tab-profile" class="flex flex-col items-center gap-1 transition-all text-slate-500 hover:text-slate-300">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold tracking-wide">Profile</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- ZENITH CORE ENGINE -->
+    <script>
+        // Default Seed Data
+        const DEFAULT_SERVICES = [
+            { id: 1, name: 'Alex Rivera', role: 'Auto Detailing Specialist', service: 'Executive Car Wash & Ceramic Coat', rating: 4.9, reviews: 142, price: 1500, eta: '15 mins', category: 'Auto', verified: true },
+            { id: 2, name: 'Sarah Jenkins', role: 'Home Hygiene Lead', service: 'Deep Villa & Apartment Cleaning', rating: 4.8, reviews: 98, price: 2500, eta: '25 mins', category: 'Home', verified: true },
+            { id: 3, name: 'David Miller', role: 'Master Technician', service: 'AC, Solar & Smart Grid Repair', rating: 5.0, reviews: 215, price: 1200, eta: '12 mins', category: 'Tech', verified: true },
+            { id: 4, name: 'Chef Mario', role: 'Private Culinary Artist', service: 'Private Gourmet Dinner & Catering', rating: 4.9, reviews: 76, price: 4000, eta: '40 mins', category: 'Food', verified: true },
+            { id: 5, name: 'Hassan Logistics', role: 'Express Fleet', service: 'Same-Hour City Cargo & Delivery', rating: 4.7, reviews: 310, price: 800, eta: '8 mins', category: 'Delivery', verified: true }
+        ];
+
+        const LOCATIONS = ['D.I. Khan, PK', 'Islamabad, PK', 'Lahore, PK', 'Dubai, UAE', 'London, UK'];
+
+        // Application State with Persistence
+        let state = {
+            tab: 'explore',
+            mode: 'client', // 'client' | 'provider'
+            category: 'All',
+            search: '',
+            locIndex: 0,
+            activeChat: null,
+            services: JSON.parse(localStorage.getItem('zenith_services')) || DEFAULT_SERVICES,
+            orders: JSON.parse(localStorage.getItem('zenith_orders')) || [],
+            messages: JSON.parse(localStorage.getItem('zenith_messages')) || {}
+        };
+
+        function saveState() {
+            localStorage.setItem('zenith_services', JSON.stringify(state.services));
+            localStorage.setItem('zenith_orders', JSON.stringify(state.orders));
+            localStorage.setItem('zenith_messages', JSON.stringify(state.messages));
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('hidden');
+            lucide.createIcons();
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function cycleLocation() {
+            state.locIndex = (state.locIndex + 1) % LOCATIONS.length;
+            document.getElementById('location-label').innerText = LOCATIONS[state.locIndex];
+            showToast(`Radar locked to ${LOCATIONS[state.locIndex]}`);
+        }
+
+        function toggleAppMode() {
+            state.mode = state.mode === 'client' ? 'provider' : 'client';
+            state.activeChat = null;
+            if (state.mode === 'provider') {
+                state.tab = 'hub';
+                showToast('Switched to Provider & Business Studio');
+            } else {
+                state.tab = 'explore';
+                showToast('Switched to Client Marketplace');
+            }
+            render();
+        }
+
+        function switchTab(tab) {
+            state.tab = tab;
+            state.activeChat = null;
+            render();
+        }
+
+        // Chat & Booking Logic
+        function openChat(serviceId) {
+            const provider = state.services.find(s => s.id === serviceId);
+            if (!provider) return;
+            state.activeChat = provider;
+            if (!state.messages[serviceId]) {
+                state.messages[serviceId] = [
+                    { sender: 'them', text: `Salam! I'm ${provider.name}. Ready for "${provider.service}". Share your instructions or confirm the deal below.`, time: 'Now' }
+                ];
+                saveState();
+            }
+            render();
+        }
+
+        function sendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !state.activeChat) return;
+
+            const id = state.activeChat.id;
+            state.messages[id].push({ sender: 'me', text, time: 'Just now' });
+            input.value = '';
+            saveState();
+            render();
+
+            // Simulated Instant Smart Reply
+            setTimeout(() => {
+                if (state.activeChat && state.activeChat.id === id) {
+                    state.messages[id].push({ sender: 'them', text: 'Got it! Everything is clear. Hit Confirm Deal whenever you are ready.', time: 'Just now' });
+                    saveState();
+                    render();
+                }
+            }, 700);
+        }
+
+        function confirmBooking(serviceId) {
+            const provider = state.services.find(s => s.id === serviceId);
+            if (!provider) return;
+
+            const newOrder = {
+                orderId: 'ZN-' + Math.floor(1000 + Math.random() * 9000),
+                serviceId: provider.id,
+                providerName: provider.name,
+                serviceTitle: provider.service,
+                price: provider.price,
+                status: 'In Progress',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            state.orders.unshift(newOrder);
+            state.messages[serviceId].push({ sender: 'system', text: `Escrow Deal Locked (${newOrder.orderId}) • Rs. ${provider.price.toLocaleString()}`, time: 'Now' });
+            saveState();
+            showToast(`Deal Confirmed! Order ${newOrder.orderId} is active.`);
+            render();
+        }
+
+        function completeOrder(orderId) {
+            const order = state.orders.find(o => o.orderId === orderId);
+            if (order) {
+                order.status = 'Completed';
+                saveState();
+                showToast(`Order ${orderId} marked as Completed!`);
+                render();
+            }
+        }
+
+        function publishNewService(e) {
+            e.preventDefault();
+            const title = document.getElementById('svc-title').value.trim();
+            const category = document.getElementById('svc-cat').value;
+            const price = parseInt(document.getElementById('svc-price').value, 10);
+            const eta = document.getElementById('svc-eta').value.trim() || '20 mins';
+
+            if (!title || isNaN(price)) return;
+
+            const newService = {
+                id: Date.now(),
+                name: 'Uzair (Founder Pro)',
+                role: 'Verified Zenith Partner',
+                service: title,
+                rating: 5.0,
+                reviews: 1,
+                price: price,
+                eta: eta,
+                category: category,
+                verified: true,
+                isUserOwned: true
+            };
+
+            state.services.unshift(newService);
+            saveState();
+            showToast('Service published live to Zenith Global Feed!');
+            state.mode = 'client';
+            state.tab = 'explore';
+            render();
+        }
+
+        function resetDemoData() {
+            localStorage.clear();
+            state.services = DEFAULT_SERVICES;
+            state.orders = [];
+            state.messages = {};
+            showToast('System reset to factory defaults');
+            render();
+        }
+
+        // MAIN RENDER ENGINE
+        function render() {
+            const viewport = document.getElementById('viewport');
+            
+            // Update Header Mode Pill
+            const modeText = document.getElementById('mode-text');
+            const modePill = document.getElementById('mode-pill');
+            if (state.mode === 'provider') {
+                modeText.innerText = 'Provider';
+                modePill.className = 'px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all flex items-center gap-1.5 bg-indigo-600/20 border-indigo-500 text-indigo-300';
+            } else {
+                modeText.innerText = 'Client';
+                modePill.className = 'px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all flex items-center gap-1.5 bg-slate-800/90 border-slate-700 text-slate-200 hover:border-indigo-500';
+            }
+
+            // Update Order Notification Dot
+            const activeOrdersCount = state.orders.filter(o => o.status === 'In Progress').length;
+            const badge = document.getElementById('order-badge');
+            if (activeOrdersCount > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+
+            // Update Bottom Nav Active State
+            ['explore', 'orders', 'hub', 'profile'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (!el) return;
+                el.className = `flex flex-col items-center gap-1 transition-all relative ${state.tab === t && !state.activeChat ? 'text-indigo-400 scale-105' : 'text-slate-500 hover:text-slate-300'}`;
+            });
+
+            // VIEW 1: REAL-TIME CHAT & ESCROW DEAL ROOM
+            if (state.activeChat) {
+                const p = state.activeChat;
+                const msgs = state.messages[p.id] || [];
+                const existingOrder = state.orders.find(o => o.serviceId === p.id && o.status === 'In Progress');
+
+                viewport.innerHTML = `
+                    <div class="flex flex-col h-full">
+                        <!-- Chat Header -->
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-indigo-950 border border-indigo-500/30 flex items-center justify-center font-bold text-indigo-300">
+                                    ${p.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1">
+                                        <h3 class="text-sm font-bold text-white">${p.name}</h3>
+                                        <i data-lucide="badge-check" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                    </div>
+                                    <p class="text-[11px] text-slate-400">${p.service} • ETA ${p.eta}</p>
+                                </div>
+                            </div>
+                            <button onclick="state.activeChat = null; render();" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 rounded-xl border border-slate-700">
+                                Close
+                            </button>
+                        </div>
+
+                        <!-- Messages Stream -->
+                        <div class="flex-1 overflow-y-auto py-4 space-y-3 no-scrollbar">
+                            ${msgs.map(m => {
+                                if (m.sender === 'system') {
+                                    return `<div class="text-center my-2"><span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold rounded-full">${m.text}</span></div>`;
+                                }
+                                const isMe = m.sender === 'me';
+                                return `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="max-w-[80%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed ${isMe ? 'bg-indigo-600 text-white rounded-br-sm shadow-md' : 'bg-slate-800 text-slate-200 border border-slate-700/70 rounded-bl-sm'}">
+                                            ${m.text}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <!-- Escrow Action & Input -->
+                        <div class="pt-3 border-t border-slate-800 space-y-2.5">
+                            ${!existingOrder ? `
+                                <button onclick="confirmBooking(${p.id})" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i> Lock Secure Deal • Rs. ${p.price.toLocaleString()}
+                                </button>
+                            ` : `
+                                <div class="p-2.5 bg-emerald-950/50 border border-emerald-500/30 rounded-xl flex items-center justify-between text-xs">
+                                    <span class="text-emerald-300 font-semibold flex items-center gap-1.5"><i data-lucide="radio" class="w-3.5 h-3.5 animate-pulse"></i> Active Order (${existingOrder.orderId})</span>
+                                    <button onclick="switchTab('orders')" class="text-[11px] underline text-white font-bold">Track</button>
+                                </div>
+                            `}
+                            <form onsubmit="sendMessage(event)" class="flex gap-2">
+                                <input type="text" id="chat-input" placeholder="Message ${p.name}..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                <button type="submit" class="px-4 bg-slate-800 hover:bg-indigo-600 text-white rounded-xl border border-slate-700 transition-colors flex items-center justify-center">
+                                    <i data-lucide="send" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // VIEW 2: EXPLORE MARKETPLACE
+            if (state.tab === 'explore') {
+                const categories = ['All', 'Auto', 'Home', 'Tech', 'Food', 'Delivery'];
+                const filtered = state.services.filter(s => {
+                    const matchCat = state.category === 'All' || s.category === state.category;
+                    const q = state.search.toLowerCase();
+                    const matchSearch = s.service.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q);
+                    return matchCat && matchSearch;
+                });
+
+                viewport.innerHTML = `
+                    <!-- Live Radar Hero -->
+                    <div class="relative bg-gradient-to-br from-indigo-950/90 via-slate-900 to-slate-900 border border-indigo-500/25 p-5 rounded-3xl overflow-hidden shadow-xl">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-bold text-indigo-300 mb-2.5">
+                                    <span class="relative flex h-2 w-2">
+                                        <span class="radar-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                                    </span>
+                                    ${state.services.length} VERIFIED EXPERTS ONLINE
+                                </div>
+                                <h2 class="text-xl font-extrabold text-white tracking-tight leading-snug">Command any service.<br>Delivered in minutes.</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instant Search -->
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-4 top-3.5 text-slate-400 w-4 h-4"></i>
+                        <input type="text" value="${state.search}" oninput="state.search = this.value; render();" placeholder="Search repairs, cleaning, auto, delivery..." class="w-full bg-slate-800/70 border border-slate-700/80 text-xs rounded-2xl pl-11 pr-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all">
+                    </div>
+
+                    <!-- Category Pills -->
+                    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                        ${categories.map(cat => `
+                            <button onclick="state.category = '${cat}'; render();" class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap border transition-all ${state.category === cat ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/25' : 'bg-slate-800/60 text-slate-400 border-slate-800 hover:text-white'}">
+                                ${cat}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Provider Cards Feed -->
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Top Rated Nearby</h3>
+                            <span class="text-[11px] text-slate-500">${filtered.length} results</span>
+                        </div>
+                        ${filtered.length === 0 ? `
+                            <div class="text-center py-10 bg-slate-800/30 rounded-3xl border border-slate-800">
+                                <p class="text-xs text-slate-400">No services found for "${state.search}"</p>
+                                <button onclick="state.search=''; state.category='All'; render();" class="mt-2 text-xs text-indigo-400 font-bold hover:underline">Reset Filters</button>
+                            </div>
+                        ` : filtered.map(s => `
+                            <div class="bg-slate-800/50 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 p-4 rounded-2xl transition-all flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3.5 min-w-0">
+                                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 flex items-center justify-center font-display font-extrabold text-indigo-300 text-base shrink-0">
+                                        ${s.name.charAt(0)}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <h4 class="text-sm font-bold text-white truncate">${s.name}</h4>
+                                            <i data-lucide="badge-check" class="w-3.5 h-3.5 text-indigo-400 shrink-0"></i>
+                                        </div>
+                                        <p class="text-xs text-slate-300 truncate mt-0.5">${s.service}</p>
+                                        <div class="flex items-center gap-2 mt-1.5 text-[11px] text-slate-400">
+                                            <span class="text-amber-400 font-semibold">★ ${s.rating}</span>
+                                            <span>•</span>
+                                            <span class="text-emerald-400 font-medium">${s.eta}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-2 shrink-0">
+                                    <span class="text-xs font-extrabold text-white">Rs. ${s.price.toLocaleString()}</span>
+                                    <button onclick="openChat(${s.id})" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition-all">
+                                        Book
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // VIEW 3: LIVE ORDERS PIPELINE
+            else if (state.tab === 'orders') {
+                viewport.innerHTML = `
+                    <div class="space-y-4">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-white">Order Command Center</h2>
+                            <p class="text-xs text-slate-400">Real-time escrow & execution tracking</p>
+                        </div>
+
+                        ${state.orders.length === 0 ? `
+                            <div class="text-center py-12 bg-slate-800/30 border border-slate-800 rounded-3xl space-y-3">
+                                <div class="w-12 h-12 rounded-2xl bg-slate-800 mx-auto flex items-center justify-center text-slate-400">
+                                    <i data-lucide="layers" class="w-6 h-6"></i>
+                                </div>
+                                <p class="text-xs text-slate-400">No active orders yet. Explore services to start.</p>
+                                <button onclick="switchTab('explore')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl">Explore Marketplace</button>
+                            </div>
+                        ` : state.orders.map(o => `
+                            <div class="bg-slate-800/60 border ${o.status === 'In Progress' ? 'border-indigo-500/40' : 'border-slate-800'} p-4 rounded-2xl space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] font-mono font-bold text-slate-400">${o.orderId} • ${o.timestamp}</span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${o.status === 'In Progress' ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'}">
+                                        ${o.status}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">${o.serviceTitle}</h4>
+                                    <p class="text-xs text-slate-400 mt-0.5">Expert: ${o.providerName}</p>
+                                </div>
+                                <div class="pt-2.5 border-t border-slate-700/60 flex justify-between items-center">
+                                    <span class="text-xs font-extrabold text-white">Rs. ${o.price.toLocaleString()}</span>
+                                    ${o.status === 'In Progress' ? `
+                                        <div class="flex gap-2">
+                                            <button onclick="openChat(${o.serviceId})" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-xl">Chat</button>
+                                            <button onclick="completeOrder('${o.orderId}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl">Complete ✓</button>
+                                        </div>
+                                    ` : `<span class="text-[11px] text-emerald-400 font-semibold">Escrow Released</span>`}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // VIEW 4: PROVIDER & BUSINESS STUDIO
+            else if (state.tab === 'hub') {
+                const myListings = state.services.filter(s => s.isUserOwned);
+                const totalEarned = state.orders.filter(o => o.status === 'Completed').reduce((sum, o) => sum + o.price, 0);
+
+                viewport.innerHTML = `
+                    <div class="space-y-5">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-white">Provider & Business Studio</h2>
+                            <p class="text-xs text-slate-400">Launch services globally on Zenith Network</p>
+                        </div>
+
+                        <!-- Telemetry Metrics -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-800/60 border border-slate-800 p-4 rounded-2xl">
+                                <span class="text-[11px] text-slate-400">Completed Volume</span>
+                                <p class="text-lg font-extrabold text-white mt-1">Rs. ${totalEarned.toLocaleString()}</p>
+                            </div>
+                            <div class="bg-slate-800/60 border border-slate-800 p-4 rounded-2xl">
+                                <span class="text-[11px] text-slate-400">Active Listings</span>
+                                <p class="text-lg font-extrabold text-indigo-400 mt-1">${myListings.length} Live</p>
+                            </div>
+                        </div>
+
+                        <!-- Publish Service Form -->
+                        <form onsubmit="publishNewService(event)" class="bg-slate-800/50 border border-slate-800 p-4 rounded-3xl space-y-3.5">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> Publish New Service
+                            </h3>
+                            <div>
+                                <label class="text-[11px] text-slate-400 block mb-1">Service Title</label>
+                                <input type="text" id="svc-title" required placeholder="e.g. Full-Stack Web App / Home AC Service" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <div>
+                                    <label class="text-[11px] text-slate-400 block mb-1">Category</label>
+                                    <select id="svc-cat" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                        <option value="Tech">Tech</option>
+                                        <option value="Auto">Auto</option>
+                                        <option value="Home">Home</option>
+                                        <option value="Food">Food</option>
+                                        <option value="Delivery">Delivery</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-slate-400 block mb-1">Rate (PKR)</label>
+                                    <input type="number" id="svc-price" required placeholder="2000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-400 block mb-1">Response ETA</label>
+                                <input type="text" id="svc-eta" placeholder="e.g. 15 mins" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/25 transition-all">
+                                Publish to Live Feed
+                            </button>
+                        </form>
+                    </div>
+                `;
+            }
+
+            // VIEW 5: EXECUTIVE PROFILE & CORPORATE GOVERNANCE
+            else if (state.tab === 'profile') {
+                viewport.innerHTML = `
+                    <div class="space-y-5">
+                        <div class="flex items-center gap-4 bg-slate-800/50 border border-slate-800 p-4 rounded-3xl">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center font-display font-extrabold text-2xl text-white shadow-lg">
+                                UZ
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <h3 class="text-base font-extrabold text-white">Uzair</h3>
+                                    <i data-lucide="badge-check" class="w-4 h-4 text-indigo-400"></i>
+                                </div>
+                                <p class="text-xs text-indigo-300 font-medium">Founder & CEO • Zenith Global Industries</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">D.I. Khan HQ • Global Tier</p>
+                            </div>
+                        </div>
+
+                        <!-- Role Switcher Card -->
+                        <div class="bg-slate-800/60 border border-indigo-500/30 p-4 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Active Workspace Mode</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Currently operating as <b class="text-indigo-300 uppercase">${state.mode}</b></p>
+                            </div>
+                            <button onclick="toggleAppMode()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all">
+                                Switch Mode
+                            </button>
+                        </div>
+
+                        <!-- Corporate Telemetry -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-4 space-y-3 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-400">Parent Corporation</span><span class="font-bold text-white">Zenith Global Industries</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Release Build</span><span class="font-mono text-indigo-300">v6.0 Master Production</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Escrow Protocol</span><span class="text-emerald-400 font-semibold">Active & Encrypted</span></div>
+                        </div>
+
+                        <button onclick="resetDemoData()" class="w-full py-2.5 bg-slate-800/80 hover:bg-rose-950/50 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-800/60 rounded-xl text-xs font-semibold transition-all">
+                            Reset Local Testing Data
+                        </button>
+
+                        <!-- Corporate Footer -->
+                        <div class="text-center pt-2">
+                            <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500">ZENITH GLOBAL INDUSTRIES</p>
+                            <p class="text-[10px] text-slate-600 mt-0.5">Engineered for Global Scale • © 2026</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            lucide.createIcons();
+        }
+
+        // Boot App Instantly
+        render();
+    </script>
+</body>
+</html>
