@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Zenith — On-Demand Services Marketplace</title>
+  <meta name="description" content="Zenith is a fast on-demand services marketplace. Sign up, book trusted service providers, publish services, track orders, and manage bookings easily." />
+  <meta name="keywords" content="Zenith, on-demand services, service marketplace, book services, service providers, instant booking" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#090d16" />
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Zenith — On-Demand Services Marketplace" />
+  <meta property="og:description" content="Book trusted experts or offer your services on Zenith with instant booking and order tracking." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Zenith — On-Demand Services Marketplace" />
+  <meta name="twitter:description" content="Book trusted experts or offer your services on Zenith." />
+
+  <!-- Structured Data for Search Engines -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Zenith",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "On-demand services marketplace to discover providers, book services, publish offerings, and manage orders."
+    }
+  </script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#090d16',
+            surface: '#111827',
+            card: '#151e30',
+            accent: '#6366f1',
+            accentHover: '#4f46e5'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #090d16;
+      color: #f8fafc;
+      -webkit-tap-highlight-color: transparent;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .glass-bar {
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(14px);
+    }
+  </style>
+</head>
+<body class="bg-obsidian text-slate-100 min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Top Header -->
+  <header class="sticky top-0 z-30 glass-bar border-b border-slate-800/80">
+    <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+      <!-- Zenith Logo + Brand -->
+      <button onclick="setTab('explore')" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <div class="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-400/30 flex items-center justify-center group-hover:border-indigo-400 transition">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 18L12 5L20 18H15.6L12 12L8.4 18H4Z" fill="#818cf8"/>
+            <path d="M8.5 18L12 12.4L15.5 18H8.5Z" fill="#ffffff"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-display font-extrabold tracking-[0.14em] text-base text-white leading-none">ZENITH</div>
+          <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+            <i data-lucide="map-pin" class="w-3 h-3 text-indigo-400"></i>
+            <span id="headerLocation">D.I. Khan, PK</span>
+          </div>
+        </div>
+      </button>
+
+      <!-- Right Controls -->
+      <div class="flex items-center gap-2">
+        <button
+          id="modeToggleBtn"
+          onclick="toggleRole()"
+          class="px-3 py-1.5 rounded-full text-xs font-semibold border border-slate-700 bg-surface hover:border-indigo-400/60 transition flex items-center gap-1.5"
+          title="Switch between Client and Provider mode"
+        >
+          <span id="modeDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="modeLabel">Client</span>
+        </button>
+
+        <button
+          onclick="openAuthModal(state.user ? 'edit' : 'signup')"
+          class="h-9 px-3 rounded-xl bg-surface border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition"
+        >
+          <span id="userAvatarBadge" class="w-5 h-5 rounded-md bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center">+</span>
+          <span id="headerUserText" class="max-w-[84px] truncate">Sign Up</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto px-4 pt-4 pb-24">
+
+    <!-- EXPLORE TAB -->
+    <section id="tab-explore" class="space-y-4">
+      <div class="rounded-2xl bg-card border border-slate-800/90 p-4 sm:p-5 space-y-3.5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-display font-bold text-white">Find trusted services fast</h1>
+            <p class="text-xs sm:text-sm text-slate-400">Book available providers or switch to Provider mode to list your own service.</p>
+          </div>
+          <button
+            onclick="openAuthModal(state.user ? 'edit' : 'signup')"
+            class="self-start sm:self-auto px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center gap-1.5"
+          >
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            <span id="heroCtaText">Create Free Account</span>
+          </button>
+        </div>
+
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input
+            id="searchInput"
+            type="text"
+            oninput="renderServices()"
+            placeholder="Search car wash, cleaning, food, delivery, tech..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-500"
+          />
+        </div>
+
+        <div id="categoryChips" class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-0.5"></div>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-slate-300">Available Services</h2>
+        <span id="serviceCount" class="text-xs text-slate-500">0 results</span>
+      </div>
+      <div id="servicesList" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+    </section>
+
+    <!-- ORDERS TAB -->
+    <section id="tab-orders" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-display font-bold text-white">Orders & Deals</h1>
+          <p class="text-xs text-slate-400">Track active bookings, escrow status, and order progress.</p>
+        </div>
+      </div>
+      <div id="ordersList" class="space-y-3"></div>
+    </section>
+
+    <!-- STUDIO TAB -->
+    <section id="tab-studio" class="hidden space-y-4">
+      <div class="rounded-2xl bg-card border border-slate-800/90 p-4 sm:p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-xl font-display font-bold text-white">Publish a Service</h1>
+            <p class="text-xs text-slate-400">List what you offer so clients can discover and book it.</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-medium">Provider Studio</span>
+        </div>
+
+        <form onsubmit="publishService(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Service Title</label>
+            <input id="svcTitle" required type="text" placeholder="e.g. Express Home & Car Detailing" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Category</label>
+              <select id="svcCategory" class="w-full px-3 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white">
+                <option value="Car Care">Car Care</option>
+                <option value="Cleaning">Cleaning</option>
+                <option value="Food">Food</option>
+                <option value="Delivery">Delivery</option>
+                <option value="Tech & Repair">Tech & Repair</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Price (USD)</label>
+              <input id="svcPrice" required type="number" min="1" step="0.01" placeholder="25" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Provider Name</label>
+            <input id="svcProvider" required type="text" placeholder="Your name or service team" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Description</label>
+            <textarea id="svcDesc" required rows="2" placeholder="What is included and how fast can you deliver?" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition">
+            Publish to Zenith
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PROFILE TAB -->
+    <section id="tab-profile" class="hidden space-y-4">
+      <div id="profileContainer"></div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="fixed bottom-0 inset-x-0 z-30 glass-bar border-t border-slate-800/80">
+    <div class="max-w-3xl mx-auto grid grid-cols-4 h-16">
+      <button onclick="setTab('explore')" data-nav="explore" class="nav-btn flex flex-col items-center justify-center gap-1 text-indigo-400">
+        <i data-lucide="compass" class="w-5 h-5"></i>
+        <span class="text-[11px] font-medium">Explore</span>
+      </button>
+      <button onclick="setTab('orders')" data-nav="orders" class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-200">
+        <i data-lucide="layers" class="w-5 h-5"></i>
+        <span class="text-[11px] font-medium">Orders</span>
+      </button>
+      <button onclick="setTab('studio')" data-nav="studio" class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-200">
+        <i data-lucide="briefcase" class="w-5 h-5"></i>
+        <span class="text-[11px] font-medium">Studio</span>
+      </button>
+      <button onclick="setTab('profile')" data-nav="profile" class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-200">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span class="text-[11px] font-medium">Profile</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Auth / Account Modal -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-2xl bg-card border border-slate-800 p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M4 18L12 5L20 18H15.6L12 12L8.4 18H4Z" fill="#818cf8"/>
+            <path d="M8.5 18L12 12.4L15.5 18H8.5Z" fill="#ffffff"/>
+          </svg>
+          <h3 id="authModalTitle" class="font-display font-bold text-base text-white">Join Zenith</h3>
+        </div>
+        <button onclick="closeAuthModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Full Name</label>
+          <input id="authName" required type="text" placeholder="Enter your name" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
+          <input id="authEmail" required type="email" placeholder="you@example.com" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">City / Location</label>
+          <input id="authCity" type="text" placeholder="e.g. D.I. Khan, PK" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Short Bio (Optional)</label>
+          <input id="authBio" type="text" placeholder="What do you look for or offer?" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 focus:border-indigo-500 focus:outline-none text-sm text-white" />
+        </div>
+
+        <!-- Remember My Device -->
+        <label class="flex items-center gap-2.5 pt-1 cursor-pointer select-none">
+          <input
+            id="rememberDeviceCheckbox"
+            type="checkbox"
+            checked
+            class="w-4 h-4 rounded accent-indigo-600 bg-obsidian border-slate-700 cursor-pointer"
+          />
+          <span class="text-xs text-slate-300">Remember my device (stay signed in on this browser)</span>
+        </label>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition">
+          Save & Continue
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed top-20 right-4 z-50 hidden px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-lg"></div>
+
+  <script>
+    const STORAGE_KEY = 'zenith_app_v8';
+    const SESSION_USER_KEY = 'zenith_session_user_v8';
+    const CATEGORIES = ['All', 'Car Care', 'Cleaning', 'Food', 'Delivery', 'Tech & Repair'];
+
+    const DEFAULT_SERVICES = [
+      {
+        id: 's1',
+        title: 'Full Exterior & Interior Car Wash',
+        category: 'Car Care',
+        price: 18,
+        provider: 'Apex Auto Care',
+        rating: '4.9',
+        desc: 'Foam wash, vacuuming, dashboard polish, and tire shine.'
+      },
+      {
+        id: 's2',
+        title: 'Deep Home & Apartment Cleaning',
+        category: 'Cleaning',
+        price: 35,
+        provider: 'CleanSpace Team',
+        rating: '4.8',
+        desc: 'Kitchen, living room, and bathroom sanitization with eco supplies.'
+      },
+      {
+        id: 's3',
+        title: 'Same-Day Express Parcel Delivery',
+        category: 'Delivery',
+        price: 10,
+        provider: 'SwiftDrop Courier',
+        rating: '4.9',
+        desc: 'Fast pickup and door-to-door delivery with live status updates.'
+      },
+      {
+        id: 's4',
+        title: 'Laptop Tune-Up & Diagnostics',
+        category: 'Tech & Repair',
+        price: 25,
+        provider: 'CoreFix Labs',
+        rating: '4.7',
+        desc: 'Speed optimization, thermal cleaning, and hardware check.'
+      }
+    ];
+
+    function loadState() {
+      let base = {
+        role: 'client',
+        activeTab: 'explore',
+        selectedCategory: 'All',
+        rememberDevice: true,
+        user: null,
+        services: DEFAULT_SERVICES,
+        orders: []
+      };
+
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          base = { ...base, ...JSON.parse(raw) };
+        }
+      } catch (e) {}
+
+      // If rememberDevice was off, check sessionStorage for current tab session
+      if (!base.rememberDevice || !base.user) {
+        try {
+          const sessRaw = sessionStorage.getItem(SESSION_USER_KEY);
+          if (sessRaw) {
+            base.user = JSON.parse(sessRaw);
+          }
+        } catch (e) {}
+      }
+
+      return base;
+    }
+
+    let state = loadState();
+
+    function saveState() {
+      const toPersist = {
+        role: state.role,
+        activeTab: state.activeTab,
+        selectedCategory: state.selectedCategory,
+        rememberDevice: state.rememberDevice,
+        user: state.rememberDevice ? state.user : null,
+        services: state.services,
+        orders: state.orders
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toPersist));
+
+      if (!state.rememberDevice && state.user) {
+        sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(state.user));
+      } else {
+        sessionStorage.removeItem(SESSION_USER_KEY);
+      }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 2400);
+    }
+
+    function setTab(tab) {
+      state.activeTab = tab;
+      saveState();
+      ['explore', 'orders', 'studio', 'profile'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+      });
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const active = btn.dataset.nav === tab;
+        btn.classList.toggle('text-indigo-400', active);
+        btn.classList.toggle('text-slate-400', !active);
+      });
+      if (tab === 'orders') renderOrders();
+      if (tab === 'profile') renderProfile();
+      lucide.createIcons();
+    }
+
+    function toggleRole() {
+      state.role = state.role === 'client' ? 'provider' : 'client';
+      saveState();
+      updateHeader();
+      showToast(`Switched to ${state.role === 'client' ? 'Client' : 'Provider'} mode`);
+    }
+
+    function updateHeader() {
+      const isClient = state.role === 'client';
+      document.getElementById('modeLabel').textContent = isClient ? 'Client' : 'Provider';
+      document.getElementById('modeDot').className = `w-2 h-2 rounded-full ${isClient ? 'bg-emerald-400' : 'bg-indigo-400'}`;
+
+      const loc = state.user?.city || 'D.I. Khan, PK';
+      document.getElementById('headerLocation').textContent = loc;
+
+      if (state.user) {
+        const initials = state.user.name.trim().split(/\s+/).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'U';
+        document.getElementById('userAvatarBadge').textContent = initials;
+        document.getElementById('headerUserText').textContent = state.user.name.split(' ')[0];
+        document.getElementById('heroCtaText').textContent = 'Edit Profile';
+        if (!document.getElementById('svcProvider').value) {
+          document.getElementById('svcProvider').value = state.user.name;
+        }
+      } else {
+        document.getElementById('userAvatarBadge').textContent = '+';
+        document.getElementById('headerUserText').textContent = 'Sign Up';
+        document.getElementById('heroCtaText').textContent = 'Create Free Account';
+      }
+    }
+
+    function renderCategories() {
+      const wrap = document.getElementById('categoryChips');
+      wrap.innerHTML = CATEGORIES.map(cat => {
+        const active = state.selectedCategory === cat;
+        return `
+          <button
+            onclick="selectCategory('${cat}')"
+            class="px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition border ${
+              active
+                ? 'bg-indigo-600 border-indigo-500 text-white'
+                : 'bg-obsidian border-slate-800 text-slate-300 hover:border-slate-700'
+            }"
+          >${cat}</button>
+        `;
+      }).join('');
+    }
+
+    function selectCategory(cat) {
+      state.selectedCategory = cat;
+      saveState();
+      renderCategories();
+      renderServices();
+    }
+
+    function renderServices() {
+      const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+      const list = state.services.filter(s => {
+        const matchesCat = state.selectedCategory === 'All' || s.category === state.selectedCategory;
+        const matchesText = !q ||
+          s.title.toLowerCase().includes(q) ||
+          s.provider.toLowerCase().includes(q) ||
+          s.category.toLowerCase().includes(q) ||
+          s.desc.toLowerCase().includes(q);
+        return matchesCat && matchesText;
+      });
+
+      document.getElementById('serviceCount').textContent = `${list.length} ${list.length === 1 ? 'result' : 'results'}`;
+      const container = document.getElementById('servicesList');
+
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="col-span-full rounded-2xl bg-card border border-slate-800 p-8 text-center space-y-2">
+            <p class="text-sm font-medium text-slate-300">No matching services found</p>
+            <p class="text-xs text-slate-500">Try another keyword or switch category.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(s => `
+        <div class="rounded-2xl bg-card border border-slate-800/90 p-4 flex flex-col justify-between gap-3 hover:border-slate-700 transition">
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 text-[11px] font-medium">${s.category}</span>
+              <span class="text-xs text-amber-400 font-semibold">★ ${s.rating || '4.9'}</span>
+            </div>
+            <h3 class="font-display font-bold text-base text-white">${s.title}</h3>
+            <p class="text-xs text-slate-400 line-clamp-2">${s.desc}</p>
+          </div>
+          <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+            <div>
+              <div class="text-sm font-bold text-white">$${Number(s.price).toFixed(2)}</div>
+              <div class="text-[11px] text-slate-400">${s.provider}</div>
+            </div>
+            <button
+              onclick="bookService('${s.id}')"
+              class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition"
+            >Book Now</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function bookService(id) {
+      const svc = state.services.find(x => x.id === id);
+      if (!svc) return;
+      const clientName = state.user?.name || 'Guest User';
+      const order = {
+        id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
+        serviceTitle: svc.title,
+        provider: svc.provider,
+        clientName,
+        price: svc.price,
+        status: 'Escrow Active',
+        createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      state.orders.unshift(order);
+      saveState();
+      showToast(`Booked "${svc.title}"`);
+      setTab('orders');
+    }
+
+    function renderOrders() {
+      const wrap = document.getElementById('ordersList');
+      if (!state.orders.length) {
+        wrap.innerHTML = `
+          <div class="rounded-2xl bg-card border border-slate-800 p-8 text-center space-y-2">
+            <p class="text-sm font-medium text-slate-300">No orders yet</p>
+            <p class="text-xs text-slate-500">Book any service from Explore to start a deal.</p>
+          </div>
+        `;
+        return;
+      }
+
+      wrap.innerHTML = state.orders.map(o => `
+        <div class="rounded-2xl bg-card border border-slate-800/90 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono text-indigo-300">${o.id}</span>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/15 text-emerald-300">${o.status}</span>
+            </div>
+            <h3 class="font-display font-bold text-sm text-white">${o.serviceTitle}</h3>
+            <p class="text-xs text-slate-400">Provider: ${o.provider} • Client: ${o.clientName} • ${o.createdAt}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-white">$${Number(o.price).toFixed(2)}</span>
+            ${o.status !== 'Completed' ? `
+              <button onclick="completeOrder('${o.id}')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white">
+                Complete
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function completeOrder(orderId) {
+      const ord = state.orders.find(x => x.id === orderId);
+      if (ord) {
+        ord.status = 'Completed';
+        saveState();
+        renderOrders();
+        showToast('Order marked completed');
+      }
+    }
+
+    function publishService(e) {
+      e.preventDefault();
+      const title = document.getElementById('svcTitle').value.trim();
+      const category = document.getElementById('svcCategory').value;
+      const price = parseFloat(document.getElementById('svcPrice').value);
+      const provider = document.getElementById('svcProvider').value.trim();
+      const desc = document.getElementById('svcDesc').value.trim();
+
+      state.services.unshift({
+        id: 's_' + Date.now(),
+        title,
+        category,
+        price,
+        provider,
+        rating: '5.0',
+        desc
+      });
+      saveState();
+      e.target.reset();
+      showToast('Service published');
+      setTab('explore');
+      renderServices();
+    }
+
+    function renderProfile() {
+      const wrap = document.getElementById('profileContainer');
+      if (!state.user) {
+        wrap.innerHTML = `
+          <div class="rounded-2xl bg-card border border-slate-800/90 p-6 text-center space-y-3">
+            <h1 class="text-xl font-display font-bold text-white">Your Zenith Account</h1>
+            <p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+              Create your personal profile to book services, publish listings, and manage your activity.
+            </p>
+            <button onclick="openAuthModal('signup')" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+              Sign Up Now
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const initials = state.user.name.trim().split(/\s+/).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'U';
+      wrap.innerHTML = `
+        <div class="rounded-2xl bg-card border border-slate-800/90 p-5 space-y-4">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white font-display font-bold text-lg flex items-center justify-center">
+                ${initials}
+              </div>
+              <div>
+                <h1 class="text-lg font-display font-bold text-white">${state.user.name}</h1>
+                <p class="text-xs text-slate-400">${state.user.email}</p>
+                <p class="text-xs text-indigo-300 mt-0.5">${state.user.city || 'Location not set'}</p>
+              </div>
+            </div>
+            <button onclick="openAuthModal('edit')" class="px-3 py-2 rounded-xl bg-surface border border-slate-700 hover:border-indigo-400 text-xs font-semibold text-white">
+              Edit Profile
+            </button>
+          </div>
+
+          <p class="text-xs text-slate-300 bg-obsidian/70 border border-slate-800/80 rounded-xl p-3">
+            ${state.user.bio || 'No bio added yet.'}
+          </p>
+
+          <div class="grid grid-cols-3 gap-2.5 pt-1">
+            <div class="rounded-xl bg-obsidian border border-slate-800 p-3">
+              <div class="text-[11px] text-slate-400">Active Mode</div>
+              <div class="text-sm font-bold text-white capitalize mt-0.5">${state.role}</div>
+            </div>
+            <div class="rounded-xl bg-obsidian border border-slate-800 p-3">
+              <div class="text-[11px] text-slate-400">Total Orders</div>
+              <div class="text-sm font-bold text-white mt-0.5">${state.orders.length}</div>
+            </div>
+            <div class="rounded-xl bg-obsidian border border-slate-800 p-3">
+              <div class="text-[11px] text-slate-400">Device Memory</div>
+              <div class="text-sm font-bold ${state.rememberDevice ? 'text-emerald-400' : 'text-amber-400'} mt-0.5">
+                ${state.rememberDevice ? 'Saved' : 'Session Only'}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5 pt-2">
+            <button onclick="signOutUser()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200">
+              Sign Out
+            </button>
+            <button onclick="resetLocalData()" class="px-4 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-semibold text-rose-300">
+              Reset Local Data
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function openAuthModal(mode) {
+      document.getElementById('authModalTitle').textContent = mode === 'edit' ? 'Edit Profile' : 'Create Zenith Account';
+      document.getElementById('authName').value = state.user?.name || '';
+      document.getElementById('authEmail').value = state.user?.email || '';
+      document.getElementById('authCity').value = state.user?.city || 'D.I. Khan, PK';
+      document.getElementById('authBio').value = state.user?.bio || '';
+      document.getElementById('rememberDeviceCheckbox').checked = state.rememberDevice !== false;
+      document.getElementById('authModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      state.rememberDevice = document.getElementById('rememberDeviceCheckbox').checked;
+      state.user = {
+        name: document.getElementById('authName').value.trim(),
+        email: document.getElementById('authEmail').value.trim(),
+        city: document.getElementById('authCity').value.trim() || 'D.I. Khan, PK',
+        bio: document.getElementById('authBio').value.trim()
+      };
+      saveState();
+      closeAuthModal();
+      updateHeader();
+      renderProfile();
+      showToast(state.rememberDevice ? 'Saved on this device' : 'Signed in for this session');
+    }
+
+    function signOutUser() {
+      state.user = null;
+      saveState();
+      updateHeader();
+      renderProfile();
+      showToast('Signed out');
+    }
+
+    function resetLocalData() {
+      localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(SESSION_USER_KEY);
+      state = loadState();
+      saveState();
+      updateHeader();
+      renderCategories();
+      renderServices();
+      renderOrders();
+      renderProfile();
+      showToast('Local data reset');
+    }
+
+    // Init
+    updateHeader();
+    renderCategories();
+    renderServices();
+    setTab(state.activeTab || 'explore');
+    lucide.createIcons();
+  </script>
+</body>
+</html>
